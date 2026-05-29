@@ -50,7 +50,7 @@ class TodoWidgetFactory(private val context: Context) : RemoteViewsService.Remot
 
         // Set a fill-in intent so that clicking on a specific list item opens the app
         val fillInIntent = Intent()
-        views.setOnClickFillInIntent(R.id.item_title, fillInIntent)
+        views.setOnClickFillInIntent(R.id.widget_item_root, fillInIntent)
 
         return views
     }

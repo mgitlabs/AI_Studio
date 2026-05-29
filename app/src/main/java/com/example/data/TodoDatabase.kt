@@ -51,6 +51,7 @@ abstract class TodoDatabase : RoomDatabase() {
                     "todo_database"
                 )
                     .fallbackToDestructiveMigration()
+                    .allowMainThreadQueries()
                     .build()
                 INSTANCE = instance
                 instance
