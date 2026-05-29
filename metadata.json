@@ -1,0 +1,6 @@
+{
+  "name": "Sleek To-Do",
+  "description": "An elegant and modern interface to-do list application with sleek widget layouts for checking tasks from the home screen.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
