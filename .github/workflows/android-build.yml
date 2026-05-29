@@ -2,36 +2,42 @@ name: Android CI Build
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # এর মাধ্যমে আপনি চাইলে GitHub ড্যাশবোর্ড থেকে ম্যানুয়ালিও বিল্ড রান করতে পারবেন
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # ১. রিপোজিটরি থেকে কোড চেকআউট করা
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # ২. জাভা পরিবেশ সেটআপ করা
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
           java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle' # এটি গ্রেডল ডিপেন্ডেন্সি ক্যাশে রাখবে যাতে পরের বার বিল্ড দ্রুত হয়
 
-      # ৩. গ্রেডল এনভায়রনমেন্ট সেটআপ
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - name: Grant Execute Permission for Gradlew
+        run: chmod +x gradlew
 
-      # ৪. রিলিজ বিল্ডের সময় সাইনিং এরর এড়াতে debug config ফোর্স করা
-      - name: Build Release APK with Debug Signing
-        run: gradle assembleRelease -Pandroid.packageBuildConfig=false -PsigningConfig=debug
+      - name: Build with Gradle
+        env:
+          # গ্রেডল ডেমোনের জন্য পর্যাপ্ত মেমোরি সেট করা (OOM ক্র্যাশ রোধ করতে)
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx3024m -XX:MaxMetaspaceSize=512m"
+        run: |
+          ./gradlew assembleRelease \
+            -Pandroid.packageBuildConfig=false \
+            -PsigningConfig=debug \
+            --no-daemon \
+            --stacktrace
 
-      # ৫. বিল্ড হওয়া Release APK ফাইলটি আপলোড করা
-      - name: Upload Release APK Artifact
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
-          path: app/build/outputs/apk/release/
+          name: Release-APK
+          path: app/build/outputs/apk/release/*.apk
