@@ -1,0 +1,38 @@
+name: Android CI Build
+
+on:
+  push:
+    branches:
+      - main # তোমার ব্রাঞ্চের নাম এখানে 'main' দেওয়া আছে
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ১. রিপোজিটরি থেকে কোড চেকআউট করা
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # ২. জাভা পরিবেশ (Java SDK) সেটআপ করা
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      # ৩. গ্রেডল (Gradle) রান করার পারমিশন দেওয়া
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # ৪. অ্যান্ড্রয়েড APK বিল্ড করা (Gradle এর মাধ্যমে)
+      - name: Build with Gradle
+        run: ./gradlew assembleDebug
+
+      # ৫. বিল্ড হওয়া APK ফাইলটি GitHub-এ আপলোড করা
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          
