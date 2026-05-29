@@ -25,18 +25,18 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # ৪. মিসিং debug.keystore ফাইল স্বয়ংক্রিয়ভাবে তৈরি করা
+      # ৪. রিলিজ বিল্ডের জন্য Keystore ফাইল তৈরি করা
       - name: Generate Debug Keystore
         run: |
           keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
 
-      # ৫. gradle কমান্ড দিয়ে বিল্ড করা
-      - name: Build with Gradle
-        run: gradle assembleDebug
+      # ৫. রিলিজ APK বিল্ড করার কমান্ড (assembleRelease)
+      - name: Build Release APK with Gradle
+        run: gradle assembleRelease
 
-      # ৬. বিল্ড হওয়া APK ফাইলটি আপলোড করা
-      - name: Upload APK Artifact
+      # ৬. বিল্ড হওয়া Release APK ফাইলটি আপলোড করা
+      - name: Upload Release APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: release-apk
+          path: app/build/outputs/apk/release/app-release-unsigned.apk # অথবা app-release.apk
