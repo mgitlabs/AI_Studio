@@ -25,16 +25,11 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # ৪. গ্রেডল যে ফাইলটি খুঁজছে (my-upload-key.jks), সেটি তৈরি করা
-      - name: Generate Expected Keystore File
-        run: |
-          keytool -genkey -v -keystore my-upload-key.jks -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Release,O=Android,C=US"
+      # ৪. রিলিজ বিল্ডের সময় সাইনিং এরর এড়াতে debug config ফোর্স করা
+      - name: Build Release APK with Debug Signing
+        run: gradle assembleRelease -Pandroid.packageBuildConfig=false -PsigningConfig=debug
 
-      # ৫. রিলিজ APK বিল্ড করার কমান্ড
-      - name: Build Release APK with Gradle
-        run: gradle assembleRelease
-
-      # ৬. বিল্ড হওয়া Release APK ফাইলটি আপলোড করা
+      # ৫. বিল্ড হওয়া Release APK ফাইলটি আপলোড করা
       - name: Upload Release APK Artifact
         uses: actions/upload-artifact@v4
         with:
